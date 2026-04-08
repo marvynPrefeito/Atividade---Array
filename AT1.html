@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Compras</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        input {
+            padding: 10px;
+            width: 250px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: rgb(255, 255, 255);
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .remove-btn {
+            background: #f44336;
+            padding: 5px 10px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .remove-btn:hover {
+            background: #da190b;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        li {
+            padding: 10px;
+            background: #f9f9f9;
+            margin: 5px 0;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Compras</h1>
+    
+    <div>
+        <input type="text" id="itemInput" placeholder="Digite um item...">
+        <button onclick="adicionarItem()">Adicionar</button>
+    </div>
+
+    <ul id="listaCompras"></ul>
+
+    <script>
+        let listaCompras = [];
+
+        function adicionarItem() {
+            const input = document.getElementById('itemInput');
+            const texto = input.value.trim();
+
+            if (texto === '') {
+                alert('Por favor, digite um item!');
+                return;
+            }
+
+            listaCompras.push(texto);
+
+            input.value = '';
+
+            atualizarLista();
+        }
+
+        function removerItem(index) {
+            listaCompras.splice(index, 1);
+
+            atualizarLista();
+        }
+
+        function atualizarLista() {
+            const listaElemento = document.getElementById('listaCompras');
+            
+            listaElemento.innerHTML = '';
+
+            listaCompras.forEach(function(item, index) {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${item}</span>
+                    <button class="remove-btn" onclick="removerItem(${index})">Remover</button>
+                `;
+                listaElemento.appendChild(li);
+            });
+        }
+
+        document.getElementById('itemInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                adicionarItem();
+            }
+        });
+    </script>
+</body>
+</html>
