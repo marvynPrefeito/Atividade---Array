@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tarefas - LocalStorage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        .contador {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .input-section {
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn-add {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-add:hover {
+            transform: translateY(-2px);
+        }
+        .lista-section {
+            padding: 0 30px 30px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        ul {
+            list-style: none;
+        }
+        li {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            gap: 15px;
+        }
+        li:hover {
+            transform: translateX(5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+        .tarefa-texto {
+            flex: 1;
+            font-size: 16px;
+            word-break: break-word;
+        }
+        .btn-delete {
+            padding: 8px 12px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .btn-delete:hover {
+            background: #ff3838;
+        }
+        .vazio {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 60px 20px;
+            font-size: 18px;
+        }
+        .persistente {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Lista de Tarefas</h1>
+            <div class="contador">Tarefas salvas automaticamente <span id="contador">0</span></div>
+        </div>
+
+        <div class="input-section">
+            <div class="input-container">
+                <input type="text" id="novaTarefa" placeholder="Digite uma nova tarefa..." maxlength="100">
+                <button class="btn-add" onclick="adicionarTarefa()">Adicionar</button>
+            </div>
+            <div class="persistente">✅ Dados salvos no navegador</div>
+        </div>
+
+        <div class="lista-section">
+            <ul id="listaTarefas"></ul>
+        </div>
+    </div>
+
+    <script>
+        let tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
+
+        function salvarTarefas() {
+            localStorage.setItem('tarefas', JSON.stringify(tarefas));
+        }
+
+        function adicionarTarefa() {
+            const input = document.getElementById('novaTarefa');
+            const texto = input.value.trim();
+            
+            if (texto) {
+                tarefas.push(texto);
+                input.value = '';
+                salvarTarefas();
+                renderizarLista();
+            }
+        }
+
+        function removerTarefa(index) {
+            tarefas.splice(index, 1);
+            salvarTarefas();
+            renderizarLista();
+        }
+
+        function renderizarLista() {
+            const lista = document.getElementById('listaTarefas');
+            const contador = document.getElementById('contador');
+            
+            contador.textContent = tarefas.length;
+
+            if (tarefas.length === 0) {
+                lista.innerHTML = '<li class="vazio">Nenhuma tarefa. Adicione a primeira! 🎉</li>';
+                return;
+            }
+
+            lista.innerHTML = '';
+            tarefas.forEach((tarefa, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="tarefa-texto">${tarefa}</span>
+                    <button class="btn-delete" onclick="removerTarefa(${index})">🗑️</button>
+                `;
+                lista.appendChild(li);
+            });
+        }
+
+        document.getElementById('novaTarefa').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                adicionarTarefa();
+            }
+        });
+
+        renderizarLista();
+    </script>
+</body>
+</html>

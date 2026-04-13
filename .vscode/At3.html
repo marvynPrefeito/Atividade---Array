@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tarefas com Prioridade</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .tarefas-container {
+            margin-top: 30px;
+        }
+        .tarefas-section {
+            margin-bottom: 25px;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .alta { color: #f44336; }
+        .normal { color: #FF9800; }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 5px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        li:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        .alta-prioridade {
+            border-left-color: #f44336;
+            background: linear-gradient(90deg, #ffebee 0%, #f8f9fa 100%);
+        }
+        .normal-prioridade {
+            border-left-color: #FF9800;
+            background: linear-gradient(90deg, #fff3e0 0%, #f8f9fa 100%);
+        }
+        .titulo-tarefa {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .prioridade-label {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .alta-label {
+            background: #f44336;
+            color: white;
+        }
+        .normal-label {
+            background: #FF9800;
+            color: white;
+        }
+        .empty {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Lista de Tarefas com Prioridade</h1>
+
+        <!-- Formulário -->
+        <form id="formTarefa" onsubmit="adicionarTarefa(event)">
+            <div class="form-group">
+                <label for="tituloTarefa">Título da Tarefa:</label>
+                <input type="text" id="tituloTarefa" placeholder="Digite o título da tarefa" required>
+            </div>
+            <div class="form-group">
+                <label for="prioridade">Prioridade:</label>
+                <select id="prioridade" required>
+                    <option value="">Selecione a prioridade</option>
+                    <option value="alta">🔴 ALTA</option>
+                    <option value="normal">🟡 NORMAL</option>
+                </select>
+            </div>
+            <button type="submit">➕ Adicionar Tarefa</button>
+        </form>
+
+        <div class="tarefas-container">
+            <div class="tarefas-section">
+                <h2 class="section-title alta">🔴 Tarefas de ALTA Prioridade</h2>
+                <ul id="listaAlta"></ul>
+            </div>
+
+            <div class="tarefas-section">
+                <h2 class="section-title normal">🟡 Tarefas Normais</h2>
+                <ul id="listaNormal"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tarefas = [];
+
+        function adicionarTarefa(event) {
+            event.preventDefault();
+            
+            const titulo = document.getElementById('tituloTarefa').value.trim();
+            const prioridade = document.getElementById('prioridade').value;
+
+            if (titulo === '' || prioridade === '') {
+                alert('Preencha todos os campos!');
+                return;
+            }
+
+            const novaTarefa = {
+                titulo: titulo,
+                prioridade: prioridade
+            };
+
+            if (prioridade === 'alta') {
+                tarefas.unshift(novaTarefa);
+            } else {
+                tarefas.push(novaTarefa);
+            }
+
+            document.getElementById('formTarefa').reset();
+
+            atualizarLista();
+        }
+
+        function atualizarLista() {
+            const tarefasAlta = tarefas.filter(t => t.prioridade === 'alta');
+            const tarefasNormal = tarefas.filter(t => t.prioridade === 'normal');
+
+            const listaAlta = document.getElementById('listaAlta');
+            listaAlta.innerHTML = '';
+            tarefasAlta.forEach((tarefa, index) => {
+                listaAlta.appendChild(criarItemTarefa(tarefa, index));
+            });
+
+            if (tarefasAlta.length === 0) {
+                listaAlta.innerHTML = '<li class="empty">Nenhuma tarefa de alta prioridade</li>';
+            }
+
+            const listaNormal = document.getElementById('listaNormal');
+            listaNormal.innerHTML = '';
+            tarefasNormal.forEach((tarefa, index) => {
+                listaNormal.appendChild(criarItemTarefa(tarefa, index));
+            });
+
+            if (tarefasNormal.length === 0) {
+                listaNormal.innerHTML = '<li class="empty">Nenhuma tarefa normal</li>';
+            }
+        }
+
+        function criarItemTarefa(tarefa, index) {
+            const li = document.createElement('li');
+            const classePrioridade = tarefa.prioridade === 'alta' ? 'alta-prioridade' : 'normal-prioridade';
+            const classeLabel = tarefa.prioridade === 'alta' ? 'alta-label' : 'normal-label';
+            
+            li.className = classePrioridade;
+            li.innerHTML = `
+                <div>
+                    <div class="titulo-tarefa">${tarefa.titulo}</div>
+                    <span class="prioridade-label ${classeLabel}">${tarefa.prioridade.toUpperCase()}</span>
+                </div>
+            `;
+            return li;
+        }
+
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+                adicionarTarefa(e);
+            }
+        });
+    </script>
+</body>
+</html>

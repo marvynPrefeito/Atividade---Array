@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🥇 Ranking de Jogadores</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 38px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .total-jogadores {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+        .form-section {
+            padding: 40px;
+            background: #f8f9fa;
+            border-bottom: 3px solid #e9ecef;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 20px;
+            align-items: end;
+        }
+        input {
+            padding: 18px;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+        }
+        input::placeholder {
+            color: #888;
+        }
+        .btn-adicionar {
+            padding: 18px 35px;
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-adicionar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,184,148,0.4);
+        }
+        .ranking-section {
+            padding: 40px;
+        }
+        .ranking-title {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            position: relative;
+        }
+        .ranking-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+        .ranking-grid {
+            display: grid;
+            gap: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .jogador-item {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border-left: 5px solid #e9ecef;
+        }
+        .jogador-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        .posicao {
+            font-size: 28px;
+            font-weight: 800;
+            min-width: 50px;
+            text-align: center;
+            color: #667eea;
+        }
+        .posicao.primeiro {
+            color: #ffd700;
+            font-size: 32px;
+            text-shadow: 0 0 20px rgba(255,215,0,0.5);
+        }
+        .posicao.segundo {
+            color: #c0c0c0;
+        }
+        .posicao.terceiro {
+            color: #cd7f32;
+        }
+        .info-jogador {
+            flex: 1;
+        }
+        .nome-jogador {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .pontos {
+            font-size: 20px;
+            font-weight: 600;
+            color: #555;
+        }
+        .medalha {
+            font-size: 24px;
+            margin-left: 15px;
+        }
+        .vazio {
+            text-align: center;
+            color: #888;
+            font-size: 20px;
+            padding: 80px;
+            grid-column: 1 / -1;
+        }
+        .scroll-custom::-webkit-scrollbar {
+            width: 8px;
+        }
+        .scroll-custom::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .scroll-custom::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🥇 Ranking de Jogadores</h1>
+            <div class="total-jogadores" id="totalJogadores">0 jogadores</div>
+        </div>
+
+        <div class="form-section">
+            <form class="form-row" id="formJogador">
+                <input type="text" id="nomeJogador" placeholder="Nome do jogador" required maxlength="20">
+                <input type="number" id="pontosJogador" placeholder="Pontos" min="0" max="9999" required>
+                <button type="submit" class="btn-adicionar">➕ Adicionar</button>
+            </form>
+        </div>
+
+        <div class="ranking-section">
+            <h2 class="ranking-title">🏆 Top Ranking</h2>
+            <div class="ranking-grid scroll-custom" id="rankingLista"></div>
+        </div>
+    </div>
+
+    <script>
+        let jogadores = [];
+
+        document.getElementById('formJogador').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nome = document.getElementById('nomeJogador').value.trim();
+            const pontos = parseInt(document.getElementById('pontosJogador').value);
+            
+            if (nome && !isNaN(pontos)) {
+                jogadores.push({
+                    jogador: nome,
+                    pontos: pontos
+                });
+                
+                this.reset();
+                atualizarRanking();
+            }
+        });
+
+        function atualizarRanking() {
+            const lista = document.getElementById('rankingLista');
+            const total = document.getElementById('totalJogadores');
+            
+            jogadores.sort((a, b) => b.pontos - a.pontos);
+            
+            const rankingComPosicao = jogadores.map((jogador, index) => ({
+                ...jogador,
+                posicao: index + 1
+            }));
+            
+            total.textContent = `${jogadores.length} jogadores`;
+            
+            if (rankingComPosicao.length === 0) {
+                lista.innerHTML = '<div class="vazio">Nenhum jogador adicionado ainda 🏃‍♂️</div>';
+                return;
+            }
+            
+            lista.innerHTML = '';
+            rankingComPosicao.forEach((jogador, index) => {
+                const item = document.createElement('div');
+                item.className = 'jogador-item';
+                
+                let medalha = '';
+                let classePosicao = '';
+                if (jogador.posicao === 1) {
+                    medalha = '🥇';
+                    classePosicao = 'primeiro';
+                } else if (jogador.posicao === 2) {
+                    medalha = '🥈';
+                    classePosicao = 'segundo';
+                } else if (jogador.posicao === 3) {
+                    medalha = '🥉';
+                    classePosicao = 'terceiro';
+                }
+                
+                item.innerHTML = `
+                    <div class="posicao ${classePosicao}">${jogador.posicao}º${medalha}</div>
+                    <div class="info-jogador">
+                        <div class="nome-jogador">${jogador.jogador}</div>
+                        <div class="pontos">${jogador.pontos} pontos</div>
+                    </div>
+                `;
+                
+                lista.appendChild(item);
+            });
+        }
+    </script>
+</body>
+</html>

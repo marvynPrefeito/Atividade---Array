@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho de Compras</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .controles {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .btn-adicionar {
+            flex: 1;
+            padding: 15px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-adicionar:hover {
+            transform: translateY(-3px);
+        }
+        .btn-remover {
+            flex: 1;
+            padding: 15px;
+            background: linear-gradient(45deg, #f44336, #da190b);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-remover:hover:not(:disabled) {
+            transform: translateY(-3px);
+        }
+        .btn-remover:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .contador {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .lista-carrinho {
+            min-height: 200px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 12px 0;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .produto-info {
+            flex: 1;
+        }
+        .produto-nome {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        .produto-preco {
+            color: #4CAF50;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .produto-id {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .vazio {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 60px 20px;
+            font-size: 18px;
+        }
+        .total {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛒 Carrinho de Compras</h1>
+        
+        <div class="controles">
+            <button class="btn-adicionar" onclick="adicionarProduto()">➕ Adicionar Produto</button>
+            <button class="btn-remover" onclick="removerProduto()" id="btnRemover">🗑️ Remover Último</button>
+        </div>
+
+        <div class="contador">
+            Produtos no carrinho: <span id="contador">0</span>
+        </div>
+
+        <div class="lista-carrinho">
+            <ul id="listaCarrinho"></ul>
+        </div>
+
+        <div class="total" id="total" style="display: none;">
+            Total: R$ <span id="valorTotal">0</span>
+        </div>
+    </div>
+
+    <script>
+        let carrinho = [];
+        let proximoId = 1;
+
+        function adicionarProduto() {
+            const produto = {
+                id: proximoId++,
+                nome: `Produto ${proximoId - 1}`,
+                preco: (Math.random() * 100 + 10).toFixed(2)
+            };
+            carrinho.push(produto);
+            atualizarDOM();
+        }
+
+        function removerProduto() {
+            if (carrinho.length > 0) {
+                carrinho.pop();
+                atualizarDOM();
+            }
+        }
+
+        function atualizarDOM() {
+            const lista = document.getElementById('listaCarrinho');
+            const contador = document.getElementById('contador');
+            const btnRemover = document.getElementById('btnRemover');
+            const totalDiv = document.getElementById('total');
+            const valorTotal = document.getElementById('valorTotal');
+
+            contador.textContent = carrinho.length;
+            btnRemover.disabled = carrinho.length === 0;
+
+            if (carrinho.length === 0) {
+                lista.innerHTML = '<li class="vazio">Carrinho vazio</li>';
+                totalDiv.style.display = 'none';
+                return;
+            }
+
+            lista.innerHTML = '';
+            let total = 0;
+
+            carrinho.forEach(produto => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="produto-info">
+                        <div class="produto-nome">${produto.nome}</div>
+                        <div class="produto-preco">R$ ${produto.preco}</div>
+                    </div>
+                    <div class="produto-id">#${produto.id}</div>
+                `;
+                lista.appendChild(li);
+                total += parseFloat(produto.preco);
+            });
+
+            valorTotal.textContent = total.toFixed(2);
+            totalDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

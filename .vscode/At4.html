@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos com Desconto - MAP</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 18px;
+        }
+        .comparacao {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .lista-produtos {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 3px solid #e9ecef;
+        }
+        .lista-desconto {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            border: 3px solid #4CAF50;
+        }
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .preco-original {
+            color: #666;
+            text-decoration: line-through;
+            font-size: 14px;
+        }
+        .preco-desconto {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4CAF50;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        li:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .lista-desconto li {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+        .nome-produto {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .lista-original .nome-produto { color: #333; }
+        .lista-desconto .nome-produto { color: white; }
+        .economia {
+            background: #FF9800;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .total {
+            background: #333;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .destaque {
+            font-size: 28px;
+            color: #4CAF50;
+            font-weight: 800;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛒 Produtos com <span class="destaque">10% OFF</span></h1>
+        <div class="comparacao">
+            <div class="lista-produtos lista-original">
+                <h2 class="section-title">💰 Preços Originais</h2>
+                <ul id="listaOriginal"></ul>
+            </div>
+
+            <div class="lista-produtos lista-desconto">
+                <h2 class="section-title" style="color: white;">🎉 Preços com 10% OFF</h2>
+                <ul id="listaDesconto"></ul>
+            </div>
+        </div>
+
+        <div class="total">
+            <div>Total Original: R$ <span id="totalOriginal">0</span></div>
+            <div>Total com Desconto: R$ <span id="totalDesconto">0</span></div>
+            <div>Você economiza: R$ <span id="economiaTotal" class="destaque">0</span></div>
+        </div>
+    </div>
+
+    <script>
+        const produtos = [
+            { nome: "Mouse", preco: 50 },
+            { nome: "Teclado", preco: 100 },
+            { nome: "Monitor", preco: 800 }
+        ];
+
+        const produtosDesconto = produtos.map(produto => ({
+            ...produto,
+            precoDesconto: (produto.preco * 0.9).toFixed(2),
+            economia: (produto.preco * 0.1).toFixed(2)
+        }));
+
+        function atualizarHTML() {
+            const listaOriginal = document.getElementById('listaOriginal');
+            listaOriginal.innerHTML = '';
+            produtos.forEach(produto => {
+                listaOriginal.appendChild(criarItemOriginal(produto));
+            });
+
+            const listaDesconto = document.getElementById('listaDesconto');
+            listaDesconto.innerHTML = '';
+            produtosDesconto.forEach(produto => {
+                listaDesconto.appendChild(criarItemDesconto(produto));
+            });
+
+            const totalOriginal = produtos.reduce((sum, p) => sum + p.preco, 0);
+            const totalDesconto = produtosDesconto.reduce((sum, p) => sum + parseFloat(p.precoDesconto), 0);
+            
+            document.getElementById('totalOriginal').textContent = totalOriginal.toFixed(2);
+            document.getElementById('totalDesconto').textContent = totalDesconto.toFixed(2);
+            document.getElementById('economiaTotal').textContent = (totalOriginal - totalDesconto).toFixed(2);
+        }
+
+        function criarItemOriginal(produto) {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <div>
+                    <div class="nome-produto">${produto.nome}</div>
+                    <div class="preco-original">R$ ${produto.preco.toFixed(2)}</div>
+                </div>
+            `;
+            return li;
+        }
+
+        function criarItemDesconto(produto) {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <div>
+                    <div class="nome-produto">${produto.nome}</div>
+                    <div class="preco-original">R$ ${produto.preco.toFixed(2)}</div>
+                    <div class="preco-desconto">R$ ${produto.precoDesconto}</div>
+                </div>
+                <div class="economia">-${produto.economia}</div>
+            `;
+            return li;
+        }
+
+        atualizarHTML();
+    </script>
+</body>
+</html>
